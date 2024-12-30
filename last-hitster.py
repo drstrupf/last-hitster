@@ -13,6 +13,7 @@ Options:
 """
 
 import os
+from collections import defaultdict
 from random import choice
 
 from docopt import docopt
@@ -30,10 +31,14 @@ SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 EXCLUDED_WORDS = ["intro", "live", "cover", "remix", "re-mix"]
 
 artists = set()
+dict_of_shame = defaultdict(set)
 network = pylast.LastFMNetwork(LASTFM_API_KEY, LASTFM_API_SECRET)
 for player in arguments["<player>"]:
     user = network.get_user(player)
-    artists = artists.union(user.get_top_artists(limit=100))
+    players_top_artists = user.get_top_artists(limit=100)
+    artists = artists.union(players_top_artists)
+    for artist in players_top_artists:
+        dict_of_shame[artist.item.get_name()].add(player)
 
 sp = spotipy.Spotify(
     auth_manager=spotipy.SpotifyOAuth(
@@ -70,6 +75,7 @@ while True:
     artist_names = ", ".join(artist["name"] for artist in track["artists"])
     year = track["album"]["release_date"][:4]
     print(f"  {track['name']} by {artist_names} ({year})")
+    print(f"  Thanks {', '.join(dict_of_shame[artist.item.get_name()])}!")
 
     input("Press Enter to pause")
     if sp.currently_playing()["is_playing"]:

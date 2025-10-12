@@ -3,6 +3,7 @@ LastHitster
 Personalized [Hitster](https://hitstergame.com/) based on the player's [Last.fm](
 https://www.last.fm) scrobbles.
 
+![Screenshot of six rounds.](Screenshot.png)
 
 Setup
 -----
